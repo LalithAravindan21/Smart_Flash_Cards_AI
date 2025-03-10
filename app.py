@@ -9,7 +9,7 @@ from io import BytesIO
 from fpdf import FPDF
 
 # Set your OpenAI API key
-openai.api_key = "your_openai_api_key"
+openai.api_key = "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"
 
 def extract_text_from_file(uploaded_file):
     file_type = uploaded_file.name.split(".")[-1].lower()
@@ -30,14 +30,15 @@ def extract_text_from_file(uploaded_file):
     return text
 
 def chat_with_document(user_input, document_text):
-    response = openai.ChatCompletion.create(
+    client = openai.OpenAI()
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=[
             {"role": "system", "content": "You are an AI assistant that answers questions based on the provided document."},
             {"role": "user", "content": f"Document Text: {document_text}\n\nUser Question: {user_input}"}
         ]
     )
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content
 
 def generate_flashcards(text):
     prompt = f"""
@@ -48,13 +49,14 @@ def generate_flashcards(text):
     {text}
     """
     
-    response = openai.ChatCompletion.create(
+    client = openai.OpenAI()
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=[{"role": "system", "content": "You are a helpful assistant that creates educational flashcards."},
                   {"role": "user", "content": prompt}]
     )
     
-    flashcards = json.loads(response['choices'][0]['message']['content'])
+    flashcards = json.loads(response.choices[0].message.content)
     return flashcards
 
 def create_pdf_flashcards(flashcards):
